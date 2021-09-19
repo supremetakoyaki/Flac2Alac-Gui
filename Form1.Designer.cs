@@ -189,6 +189,7 @@
             this.InputFilesListView.FullRowSelect = true;
             this.InputFilesListView.HideSelection = false;
             this.InputFilesListView.Location = new System.Drawing.Point(9, 30);
+            this.InputFilesListView.MultiSelect = false;
             this.InputFilesListView.Name = "InputFilesListView";
             this.InputFilesListView.Size = new System.Drawing.Size(665, 351);
             this.InputFilesListView.TabIndex = 0;
@@ -196,6 +197,8 @@
             this.InputFilesListView.View = System.Windows.Forms.View.Details;
             this.InputFilesListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.InputFilesListView_DragDrop);
             this.InputFilesListView.DragEnter += new System.Windows.Forms.DragEventHandler(this.InputFilesListView_DragEnter);
+            this.InputFilesListView.DoubleClick += new System.EventHandler(this.InputFilesListView_DoubleClick);
+            this.InputFilesListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.InputFilesListView_KeyDown);
             // 
             // FilepathHeader
             // 

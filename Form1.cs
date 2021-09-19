@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Diagnostics;
+using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using System.IO.Compression;
-using System.Net.Http;
-using System.Net;
-using System.Diagnostics;
 
 namespace Flac2Alac_Gui
 {
@@ -138,6 +133,19 @@ namespace Flac2Alac_Gui
             }
         }
 
+        private bool Contains(string FileName)
+        {
+            foreach (ListViewItem Item in InputFilesListView.Items)
+            {
+                if (Item.Text == FileName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void AddFilesButton_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog Dialog = new OpenFileDialog())
@@ -149,8 +157,10 @@ namespace Flac2Alac_Gui
                 {
                     foreach (string FileName in Dialog.FileNames)
                     {
-
-                        InputFilesListView.Items.Add(new ListViewItem(FileName));
+                        if (!Contains(FileName))
+                        {
+                            InputFilesListView.Items.Add(new ListViewItem(FileName));
+                        }
                     }
                 }
             }
@@ -321,7 +331,7 @@ namespace Flac2Alac_Gui
 
         private void InputFilesListView_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.Text))
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 e.Effect = DragDropEffects.Copy;
             }
@@ -329,12 +339,44 @@ namespace Flac2Alac_Gui
             {
                 e.Effect = DragDropEffects.None;
             }
-
         }
 
         private void InputFilesListView_DragDrop(object sender, DragEventArgs e)
         {
-            InputFilesListView.Items.Add(new ListViewItem(e.Data.GetData(DataFormats.Text).ToString()));
+            InputFilesListView.Items.Add(new ListViewItem(e.Data.GetData(DataFormats.FileDrop).ToString()));
+        }
+
+        private void DeleteSelectedFile()
+        {
+            if (InputFilesListView.SelectedItems.Count == 1)
+            {
+                int Index = InputFilesListView.SelectedItems[0].Index;
+                InputFilesListView.Items.RemoveAt(Index);
+
+                if (InputFilesListView.Items.Count > Index)
+                {
+                    InputFilesListView.SelectedIndices.Add(Index);
+                    Select();
+                }
+                else if (Index != 0 && InputFilesListView.Items.Count > Index - 1)
+                {
+                    InputFilesListView.SelectedIndices.Add(Index - 1);
+                    Select();
+                }
+            }
+        }
+
+        private void InputFilesListView_DoubleClick(object sender, EventArgs e)
+        {
+            DeleteSelectedFile();
+        }
+
+        private void InputFilesListView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                DeleteSelectedFile();
+            }
         }
     }
 }
