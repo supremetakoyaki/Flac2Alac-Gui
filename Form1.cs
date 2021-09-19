@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
@@ -116,7 +117,11 @@ namespace Flac2Alac_Gui
             {
                 Dialog.IsFolderPicker = true;
 
-                if (Directory.Exists("Converted"))
+                if (Directory.Exists(OutputDirectoryPath))
+                {
+                    Dialog.InitialDirectory = OutputDirectoryPath;
+                }
+                else if (Directory.Exists("Converted"))
                 {
                     Dialog.InitialDirectory = Environment.CurrentDirectory + "\\Converted";
                 }
@@ -150,7 +155,7 @@ namespace Flac2Alac_Gui
         {
             using (OpenFileDialog Dialog = new OpenFileDialog())
             {
-                Dialog.Filter = "FLAC files|*.flac";
+                Dialog.Filter = "Supported lossless audio files|*.flac;*.wav|All files (*.*)|*.*";
                 Dialog.Multiselect = true;
 
                 if (Dialog.ShowDialog() == DialogResult.OK)
@@ -159,7 +164,17 @@ namespace Flac2Alac_Gui
                     {
                         if (!Contains(FileName))
                         {
-                            InputFilesListView.Items.Add(new ListViewItem(FileName));
+                            if (!FileName.EndsWith(".flac") && !FileName.EndsWith(".wav"))
+                            {
+                                if (MessageBox.Show(string.Format("{0}\n\nThis file doesn't have a FLAC or WAV extension. Do you still want to add it?", FileName), "Notice", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                {
+                                    InputFilesListView.Items.Add(new ListViewItem(FileName));
+                                }
+                            }
+                            else
+                            {
+                                InputFilesListView.Items.Add(new ListViewItem(FileName));
+                            }
                         }
                     }
                 }
@@ -221,7 +236,7 @@ namespace Flac2Alac_Gui
                 }
             }
 
-            MessageBox.Show("Finished!");
+            MessageBox.Show("Finished!", "Notice");
 
             if (ConvertButton.InvokeRequired)
             {
@@ -294,7 +309,7 @@ namespace Flac2Alac_Gui
             }
             catch (Exception ex)
             {
-                MessageBox.Show("There was an error...\n" + ex.ToString());
+                MessageBox.Show("There was an error...\n" + ex.ToString(), "Oops");
             }
         }
 
@@ -314,7 +329,7 @@ namespace Flac2Alac_Gui
 
                 if (Entry == null)
                 {
-                    MessageBox.Show("Error! I cannot extract ffmpeg.exe from the .zip file (it doesn't exist?) Try doing it yourself.");
+                    MessageBox.Show("Error! I cannot extract ffmpeg.exe from the .zip file (it doesn't exist?) Try doing it yourself.", "Oops");
                     return;
                 }
 
@@ -324,7 +339,7 @@ namespace Flac2Alac_Gui
             File.Delete("ffmpeg-release-essentials.zip");
             FfmpegPath = Environment.CurrentDirectory + "\\ffmpeg.exe";
 
-            MessageBox.Show("Finished!");
+            MessageBox.Show("Finished downloading ffmpeg. You can now proceed to convert.", "Notice");
             FfmpegDownloadProgressBar.Value = 0;
             SaveSettings();
         }
@@ -343,7 +358,25 @@ namespace Flac2Alac_Gui
 
         private void InputFilesListView_DragDrop(object sender, DragEventArgs e)
         {
-            InputFilesListView.Items.Add(new ListViewItem(e.Data.GetData(DataFormats.FileDrop).ToString()));
+            string[] FileList = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+
+            foreach (string File in FileList)
+            {
+                if (!Contains(File))
+                {
+                    if (!File.EndsWith(".flac") && !File.EndsWith(".wav"))
+                    {
+                        if (MessageBox.Show(string.Format("{0}\n\nThis file doesn't have a FLAC or WAV extension. Do you still want to add it?", File), "Notice", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            InputFilesListView.Items.Add(new ListViewItem(File));
+                        }
+                    }
+                    else
+                    {
+                        InputFilesListView.Items.Add(new ListViewItem(File));
+                    }
+                }
+            }
         }
 
         private void DeleteSelectedFile()
