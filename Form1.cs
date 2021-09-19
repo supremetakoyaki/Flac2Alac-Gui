@@ -188,36 +188,57 @@ namespace Flac2Alac_Gui
 
         private void ConvertButton_Click(object sender, EventArgs e)
         {
-            if (!File.Exists(FfmpegPath))
+            if (FfmpegDownloadWorker.IsBusy)
             {
-                MessageBox.Show("Invalid path for ffmpeg.exe");
+                MessageBox.Show("Let's wait until ffmpeg finishes downloading.", "Oops");
+                return;
+            }
+            else if (!File.Exists(FfmpegPath))
+            {
+                MessageBox.Show("Invalid path for ffmpeg.exe", "Oops");
                 return;
             }
 
-
             Task.Run(BeginConversion);
-
-
         }
 
         private void BeginConversion()
         {
-            if (ConvertButton.InvokeRequired)
+            if (InvokeRequired)
             {
-                ConvertButton.Invoke(new Action(() => { ConvertButton.Enabled = false; } ));
+                Invoke(new Action(() =>
+                { 
+                    ConvertButton.Enabled = false;
+                    DownloadFfmpegButton.Enabled = false;
+                    BrowseFfmpeg_Button.Enabled = false;
+                    BrowseOutputFolder_Button.Enabled = false;
+                    AddFilesButton.Enabled = false;
+                    ClearQueueButton.Enabled = false;
+                    GeneralProgressBar.Value = 0;
+                }
+                ));
             }
             else
             {
                 ConvertButton.Enabled = false;
+                DownloadFfmpegButton.Enabled = false;
+                BrowseFfmpeg_Button.Enabled = false;
+                BrowseOutputFolder_Button.Enabled = false;
+                AddFilesButton.Enabled = false;
+                ClearQueueButton.Enabled = false;
+                GeneralProgressBar.Value = 0;
             }
+
+            double Progress = 0;
+            double Increment = InputFilesListView.Items.Count == 0 ? 0 : (double)100 / InputFilesListView.Items.Count;
 
             while (InputFilesListView.Items.Count > 0)
             {
                 string InputFileName = "";
 
-                if (InputFilesListView.InvokeRequired)
+                if (InvokeRequired)
                 {
-                    InputFilesListView.Invoke(new Action(() => { InputFileName = InputFilesListView.Items[0].Text;  }));
+                    Invoke(new Action(() => { InputFileName = InputFilesListView.Items[0].Text;  }));
                 }
                 else
                 {
@@ -226,25 +247,67 @@ namespace Flac2Alac_Gui
 
                 RunConvertProcess(InputFileName);
 
-                if (InputFilesListView.InvokeRequired)
+                if (InvokeRequired)
                 {
-                    InputFilesListView.Invoke(new Action(() => { InputFilesListView.Items.RemoveAt(0); }));
+                    Invoke(new Action(() =>
+                    {
+                        InputFilesListView.Items.RemoveAt(0);
+
+                        if (Progress + Increment > 99)
+                        {
+                            Progress = 99;
+                        }
+                        else
+                        {
+                            Progress = Progress + Increment;
+                        }
+
+                        GeneralProgressBar.Value = (int)Progress;
+                    }
+                    ));
                 }
                 else
                 {
                     InputFilesListView.Items.RemoveAt(0);
+
+                    if (Progress + Increment > 99)
+                    {
+                        Progress = 100;
+                    }
+                    else
+                    {
+                        Progress = Progress + Increment;
+                    }
+
+                    GeneralProgressBar.Value = (int)Progress;
                 }
             }
 
             MessageBox.Show("Finished!", "Notice");
 
-            if (ConvertButton.InvokeRequired)
+            if (InvokeRequired)
             {
-                ConvertButton.Invoke(new Action(() => { ConvertButton.Enabled = true; }));
+                Invoke(new Action(() =>
+                {
+                    ConvertButton.Enabled = true;
+                    DownloadFfmpegButton.Enabled = true;
+                    BrowseFfmpeg_Button.Enabled = true;
+                    BrowseOutputFolder_Button.Enabled = true;
+                    AddFilesButton.Enabled = true;
+                    ClearQueueButton.Enabled = true;
+                    GeneralProgressBar.Value = 100;
+                }
+                ));
             }
             else
             {
                 ConvertButton.Enabled = true;
+                DownloadFfmpegButton.Enabled = true;
+                BrowseFfmpeg_Button.Enabled = true;
+                BrowseOutputFolder_Button.Enabled = true;
+                AddFilesButton.Enabled = true;
+                ClearQueueButton.Enabled = true;
+                GeneralProgressBar.Value = 100;
             }
         }
 
@@ -267,7 +330,7 @@ namespace Flac2Alac_Gui
         private void DownloadFfmpegButton_Click(object sender, EventArgs e)
         {
             DownloadFfmpegButton.Enabled = false;
-            FfmpegDownloadProgressBar.Value = 0;
+            GeneralProgressBar.Value = 0;
             FfmpegDownloadWorker.RunWorkerAsync();
         }
 
@@ -315,12 +378,12 @@ namespace Flac2Alac_Gui
 
         private void FfmpegDownloadWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            FfmpegDownloadProgressBar.Value = e.ProgressPercentage;
+            GeneralProgressBar.Value = e.ProgressPercentage;
         }
 
         private void FfmpegDownloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            FfmpegDownloadProgressBar.Value = 100;
+            GeneralProgressBar.Value = 100;
             DownloadFfmpegButton.Enabled = true;
 
             using (ZipArchive Archive = ZipFile.OpenRead("ffmpeg-release-essentials.zip"))
@@ -340,7 +403,7 @@ namespace Flac2Alac_Gui
             FfmpegPath = Environment.CurrentDirectory + "\\ffmpeg.exe";
 
             MessageBox.Show("Finished downloading ffmpeg. You can now proceed to convert.", "Notice");
-            FfmpegDownloadProgressBar.Value = 0;
+            GeneralProgressBar.Value = 0;
             SaveSettings();
         }
 

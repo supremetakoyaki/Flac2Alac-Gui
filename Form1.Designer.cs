@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.SettingsGroupBox = new System.Windows.Forms.GroupBox();
-            this.FfmpegDownloadProgressBar = new System.Windows.Forms.ProgressBar();
+            this.GeneralProgressBar = new System.Windows.Forms.ProgressBar();
             this.DownloadFfmpegButton = new System.Windows.Forms.Button();
             this.BrowseOutputFolder_Button = new System.Windows.Forms.Button();
             this.OutputFolder_TextBox = new System.Windows.Forms.TextBox();
@@ -50,7 +50,7 @@
             // 
             // SettingsGroupBox
             // 
-            this.SettingsGroupBox.Controls.Add(this.FfmpegDownloadProgressBar);
+            this.SettingsGroupBox.Controls.Add(this.GeneralProgressBar);
             this.SettingsGroupBox.Controls.Add(this.DownloadFfmpegButton);
             this.SettingsGroupBox.Controls.Add(this.BrowseOutputFolder_Button);
             this.SettingsGroupBox.Controls.Add(this.OutputFolder_TextBox);
@@ -65,12 +65,12 @@
             this.SettingsGroupBox.TabStop = false;
             this.SettingsGroupBox.Text = "Settings";
             // 
-            // FfmpegDownloadProgressBar
+            // GeneralProgressBar
             // 
-            this.FfmpegDownloadProgressBar.Location = new System.Drawing.Point(6, 86);
-            this.FfmpegDownloadProgressBar.Name = "FfmpegDownloadProgressBar";
-            this.FfmpegDownloadProgressBar.Size = new System.Drawing.Size(472, 25);
-            this.FfmpegDownloadProgressBar.TabIndex = 7;
+            this.GeneralProgressBar.Location = new System.Drawing.Point(6, 86);
+            this.GeneralProgressBar.Name = "GeneralProgressBar";
+            this.GeneralProgressBar.Size = new System.Drawing.Size(472, 25);
+            this.GeneralProgressBar.TabIndex = 7;
             // 
             // DownloadFfmpegButton
             // 
@@ -240,7 +240,7 @@
         private System.Windows.Forms.ListView InputFilesListView;
         private System.Windows.Forms.ColumnHeader FilepathHeader;
         private System.Windows.Forms.Button DownloadFfmpegButton;
-        private System.Windows.Forms.ProgressBar FfmpegDownloadProgressBar;
+        private System.Windows.Forms.ProgressBar GeneralProgressBar;
         private System.ComponentModel.BackgroundWorker FfmpegDownloadWorker;
     }
 }
