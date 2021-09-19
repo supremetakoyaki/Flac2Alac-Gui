@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -29,6 +30,8 @@ namespace Flac2Alac_Gui
         public Form1()
         {
             InitializeComponent();
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+
             TryLoadSettings();
             PrepareBackgroundWorker();
         }
