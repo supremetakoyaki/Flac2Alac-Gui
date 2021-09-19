@@ -16,26 +16,14 @@ namespace Flac2Alac_Gui
     {
         public string FfmpegPath
         {
-            get
-            {
-                return FfmpegLocation_TextBox.Text;
-            }
-            set
-            {
-                FfmpegLocation_TextBox.Text = value;
-            }
+            get => FfmpegLocation_TextBox.Text;
+            set => FfmpegLocation_TextBox.Text = value;
         }
 
         public string OutputDirectoryPath
         {
-            get
-            {
-                return OutputFolder_TextBox.Text;
-            }
-            set
-            {
-                OutputFolder_TextBox.Text = value;
-            }
+            get => OutputFolder_TextBox.Text;
+            set => OutputFolder_TextBox.Text = value;
         }
 
         public Form1()
@@ -207,7 +195,7 @@ namespace Flac2Alac_Gui
             if (InvokeRequired)
             {
                 Invoke(new Action(() =>
-                { 
+                {
                     ConvertButton.Enabled = false;
                     DownloadFfmpegButton.Enabled = false;
                     BrowseFfmpeg_Button.Enabled = false;
@@ -238,7 +226,7 @@ namespace Flac2Alac_Gui
 
                 if (InvokeRequired)
                 {
-                    Invoke(new Action(() => { InputFileName = InputFilesListView.Items[0].Text;  }));
+                    Invoke(new Action(() => { InputFileName = InputFilesListView.Items[0].Text; }));
                 }
                 else
                 {
@@ -315,13 +303,15 @@ namespace Flac2Alac_Gui
         {
             string OutputFileName = string.Format("{0}\\{1}.m4a", OutputDirectoryPath, Path.GetFileNameWithoutExtension(InputFileName));
 
-            ProcessStartInfo StartInfo = new ProcessStartInfo();
-            StartInfo.FileName = FfmpegPath;
-            StartInfo.UseShellExecute = false;
-            StartInfo.CreateNoWindow = true;
-            StartInfo.WorkingDirectory = Path.GetDirectoryName(FfmpegPath);
-            StartInfo.RedirectStandardOutput = true;
-            StartInfo.Arguments = string.Format("-i \"{0}\" -vn -acodec alac \"{1}\"", InputFileName, OutputFileName);
+            ProcessStartInfo StartInfo = new ProcessStartInfo
+            {
+                FileName = FfmpegPath,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = Path.GetDirectoryName(FfmpegPath),
+                RedirectStandardOutput = true,
+                Arguments = string.Format("-i \"{0}\" -vn -acodec alac \"{1}\"", InputFileName, OutputFileName)
+            };
 
             Process Proc = Process.Start(StartInfo);
             Proc.WaitForExit();
@@ -365,7 +355,7 @@ namespace Flac2Alac_Gui
 
                             StreamLocal.Close();
                         }
-                        
+
                         StreamRemote.Close();
                     }
                 }
